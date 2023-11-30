@@ -1,2 +1,5 @@
 # Dependency directories
 node_modules/
+
+# Don't include csv files
+*.csv
