@@ -1,4 +1,5 @@
-  
+import { GCCSA, SA4 } from "./constants";
+
 function perc2color(perc) {
     var r, g, b = 0;
     if(perc < 50) {
@@ -13,19 +14,26 @@ function perc2color(perc) {
     return '#' + ('000000' + h.toString(16)).slice(-6);
 }
 
-function changeLayerColours(layersArray, dataArray){
+function compareLayersToData(data, layer, layerType){
+    if (layerType === SA4) {
+        return data.SA4_CODE == layer.feature.properties.SA4_CODE21;
+    } else if (layerType === GCCSA) {
+        return data.GCCSA_CODE == layer.feature.properties.GCC_CODE21;
+    }
+}
+function changeLayerColours(layersArray, dataArray, layerType){
     const min = dataArray[0].age;
     const max = dataArray.slice(-1)[0].age
     const diff = max - min
 
     layersArray.map((layer) => {
         let perc = 100;
-        const age = dataArray.find((data) => data.SA4_CODE == layer.feature.properties.SA4_CODE21).age
+        const age = dataArray.find((data) => compareLayersToData(data, layer, layerType)).age
         if(diff > 0){
-        perc = 100 - (age - min)*100/diff
+            perc = 100 - (age - min)*100/diff
         }
         layer.setStyle(
-        {color: perc2color(perc)}
+            {color: perc2color(perc)}
         )
         layer.bindTooltip(age.toString(), { permanent: true, direction: 'center' })
 
